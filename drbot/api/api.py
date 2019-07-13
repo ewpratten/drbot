@@ -21,7 +21,6 @@ class API:
         # Ask the API for tokens
         response = requests.post("https://devrant.com/api/users/auth-token", data={
                                  "username": username.lower(), "password": password, "app": self.app_id, "plat": self.plat_id}).json()
-        print(response)
 
         # Check for a failed response
         if not response["success"]:
@@ -73,14 +72,39 @@ class API:
         # Return the user's profile
         return response["profile"]
 
-    def getRantById(self, id: int):
-        pass
+    def getUsername(self, user_id: int):
+        # Ask the API for a profile
+        response = requests.get(f"https://devrant.com/api/users/{user_id}", params={
+                                "app": self.app_id, "plat": self.plat_id}).json()
+
+        # Check for an incorrect user_id
+        if not response["success"]:
+            raise UnknownAPIException
+
+        # Return the user's profile
+        return response["profile"]["username"]
 
     def postRant(self, body: str, tags: str):
-        pass
+        """ Post a rant """
 
-    def postComment(self, content):
-        pass
+        # Send a post to the API
+        response = requests.post("https://devrant.com/api/devrant/rants/", data={
+                                 "app": self.app_id, "plat": self.plat_id, "user_id": self.auth_token["user"], "token_id": self.auth_token["id"], "token_key": self.auth_token["key"], "rant": body, "tags": tags}).json()
+        
+        # Check for a failed post
+        if not response["success"]:
+            raise FailedRantException
+
+    def postComment(self, rant_id: int, content: str):
+        """ Post a comment on a given rant """
+
+        # Send a post to the API
+        response = requests.post("https://devrant.com/api/devrant/rants/" + str(rant_id) + "/comments", data={
+                                 "app": self.app_id, "plat": self.plat_id, "user_id": self.auth_token["user"], "token_id": self.auth_token["id"], "token_key": self.auth_token["key"], "comment": content}).json()
+        
+        # Check for a failed post
+        if not response["success"]:
+            raise FailedCommentException
 
     def getNotifs(self):
         """ Get a list of Notifs from the API """
@@ -88,10 +112,21 @@ class API:
         # Ask the API for notif data
         response = requests.get("https://devrant.com/api/users/me/notif-feed", params={
                                 "app": self.app_id, "plat": self.plat_id, "user_id": self.auth_token["user"], "token_id": self.auth_token["id"], "token_key": self.auth_token["key"]}).json()
-        
+
         # Check for an error that should never exist
         if not response["success"]:
             raise UnknownAPIException
 
+        # return a list of notifs
+        return response["data"]["items"]
+
     def clearNotifs(self):
-        pass
+        """ Tells the API to mark all Notifs as \"Read\" """
+
+        # Send data to API
+        response = requests.delete("https://devrant.com/api/users/me/notif-feed", params={
+                                   "app": self.app_id, "plat": self.plat_id, "user_id": self.auth_token["user"], "token_id": self.auth_token["id"], "token_key": self.auth_token["key"]}).json()
+
+        # Check for an error that should never exist
+        if not response["success"]:
+            raise UnknownAPIException

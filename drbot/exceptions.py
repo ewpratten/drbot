@@ -7,3 +7,9 @@ class UnknownAPIException(Exception):
 
 class InvalidUserException(Exception):
     pass
+
+class FailedCommentException(Exception):
+    pass
+
+class FailedRantException(Exception):
+    pass
