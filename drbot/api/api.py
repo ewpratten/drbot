@@ -90,7 +90,7 @@ class API:
         # Send a post to the API
         response = requests.post("https://devrant.com/api/devrant/rants/", data={
                                  "app": self.app_id, "plat": self.plat_id, "user_id": self.auth_token["user"], "token_id": self.auth_token["id"], "token_key": self.auth_token["key"], "rant": body, "tags": tags}).json()
-        
+
         # Check for a failed post
         if not response["success"]:
             raise FailedRantException
@@ -101,10 +101,24 @@ class API:
         # Send a post to the API
         response = requests.post("https://devrant.com/api/devrant/rants/" + str(rant_id) + "/comments", data={
                                  "app": self.app_id, "plat": self.plat_id, "user_id": self.auth_token["user"], "token_id": self.auth_token["id"], "token_key": self.auth_token["key"], "comment": content}).json()
-        
+
         # Check for a failed post
         if not response["success"]:
             raise FailedCommentException
+
+    def getComment(self, comment_id: int):
+        """ Get the contents of a comment from the API """
+
+        response = requests.get("https://devrant.com/api/comments/" + str(comment_id), params={
+                                "app": self.app_id, "plat": self.plat_id, "user_id": self.auth_token["user"], "token_id": self.auth_token["id"], "token_key": self.auth_token["key"]}).json()
+
+        # Check for an API error
+        if not response["success"]:
+            raise FailedCommentException
+
+        # Return the comment
+        del response["success"]
+        return response
 
     def getNotifs(self):
         """ Get a list of Notifs from the API """

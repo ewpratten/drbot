@@ -8,6 +8,7 @@ class MyBot(BotBuilder):
         
         if type == NotifType.MENTION:
             self.api.postComment(content["rant_id"], f"Hello @{content['username']}\n-------------\n\n{content}")
+            print(self.api.getComment(content["comment_id"]))
         else:
             print(type, content)
 
