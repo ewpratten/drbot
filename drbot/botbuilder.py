@@ -3,7 +3,7 @@ from threading import Thread
 import time
 from enum import Enum
 
-class NotifType():
+class NotifType(Enum):
     UNKNOWN = 0
     UPVOTE = 1
     COMMENT  =1
